@@ -26,16 +26,20 @@ def ID3(examples, default):
   if allSameClass or isTrivialSplit:
     return Node(mode(examples))
   else:
-    best = chooseAttribute(examples)
+    best, bestValues = chooseAttribute(examples)
     print "Attrib to split on: ", best
-
-    # t = new tree with root test best
-    # for value in best:
-    #     examples_i = {elements of examples with best = value}
-    #     subtree = ID3(examples_i,MODE(examples))
-    #     add branch to t with label value_i and subtree subtree
-    # return t
-    return Node(default)
+    print "Best values: ", bestValues
+    t = Node(None)
+    t.attribute = best
+    newExamples = []
+    for value in bestValues.keys():
+      for ex in examples:
+        if ex[best] == value:
+          newExamples.append(ex)
+      subtree = ID3(newExamples,mode(examples))
+      t.children[best] = Node(None) # FIX THIS
+    print "tree: ", t
+    return t
 
 ''' ----------------HELPERS--------------- '''
 
@@ -73,14 +77,16 @@ def chooseAttribute(examples):
   print "running function chooseAttribute"
   bestAttrib = None # want the attrib with minimum informationGain
   bestIG = float('inf')
+  bestValues = None
   for attrib in examples[0].keys():
     if attrib == "Class":
       continue
-    currIG = infoGain(examples,attrib)
+    currIG, values = infoGain(examples,attrib)
     if currIG < bestIG:
       bestIG = currIG
       bestAttrib = attrib
-  return bestAttrib
+      bestValues = values
+  return bestAttrib, bestValues
 
 def infoGain(examples, attribute):
   frequencies = {} # value -> class -> count
@@ -110,7 +116,7 @@ def infoGain(examples, attribute):
     ig.append(probVal*entropy)
 
   informationGain = sum(ig)
-  return informationGain
+  return informationGain, totals
 
 def prune(node, examples):
   '''
