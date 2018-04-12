@@ -18,23 +18,24 @@ def ID3(examples, default):
   isTrivialSplit = checkTrivialSplit(examples)
 
   if not examples: # examples is empty
-      return Node(default)
+    return Node(default)
 
   if all(ex.get("Class") == firstLabel for ex in examples):
-      allSameClass = True
+    allSameClass = True
 
   if allSameClass or isTrivialSplit:
-      return Node(mode(examples))
+    return Node(mode(examples))
   else:
-      best = chooseAttribute(examples)
-      print "Attrib to split on: ", best
-      # t = new tree with root test best
-      # for value in best:
-      #     examples_i = {elements of examples with best = value}
-      #     subtree = ID3(examples_i,MODE(examples))
-      #     add branch to t with label value_i and subtree subtree
-      # return t
-      return Node(default)
+    best = chooseAttribute(examples)
+    print "Attrib to split on: ", best
+
+    # t = new tree with root test best
+    # for value in best:
+    #     examples_i = {elements of examples with best = value}
+    #     subtree = ID3(examples_i,MODE(examples))
+    #     add branch to t with label value_i and subtree subtree
+    # return t
+    return Node(default)
 
 ''' ----------------HELPERS--------------- '''
 
@@ -42,15 +43,15 @@ def ID3(examples, default):
 Check for only trivial split from examples 
 '''
 def checkTrivialSplit(examples):
-    isTrivial = True
-    toMatch = examples[0]
-    for ex in examples:
-        for attrib, value in ex.iteritems():
-            ''' TODO : add robustness for missing attributes '''
-            if value != toMatch[attrib]:
-                isTrivial = False
-                break
-    return isTrivial
+  isTrivial = True
+  toMatch = examples[0]
+  for ex in examples:
+    for attrib, value in ex.iteritems():
+      ''' TODO : add robustness for missing attributes '''
+      if value != toMatch[attrib]:
+        isTrivial = False
+        break
+  return isTrivial
 
 ''' 
 Find the mode Class value from examples 
@@ -69,47 +70,47 @@ def mode(examples):
 Find the attribute that maximizes information gain
 '''
 def chooseAttribute(examples):
-    print "running function chooseAttribute"
-    bestAttrib = None # want the attrib with minimum informationGain
-    bestIG = float('inf')
-    for attrib in examples[0].keys():
-        if attrib == "Class":
-            continue
-        currIG = infoGain(examples,attrib)
-        if currIG < bestIG:
-            bestIG = currIG
-            bestAttrib = attrib
-    return bestAttrib
+  print "running function chooseAttribute"
+  bestAttrib = None # want the attrib with minimum informationGain
+  bestIG = float('inf')
+  for attrib in examples[0].keys():
+    if attrib == "Class":
+      continue
+    currIG = infoGain(examples,attrib)
+    if currIG < bestIG:
+      bestIG = currIG
+      bestAttrib = attrib
+  return bestAttrib
 
 def infoGain(examples, attribute):
-    frequencies = {} # value -> class -> count
-    totals = {} # value -> total count
-    numExamples = len(examples)
-    ig = [] # add all the values to sum to this array then use numpy to do summation
-    for ex in examples:
-        val = ex.get(attribute) # yes, no, ?
-        currClass = ex.get("Class")
-        if val in frequencies:
-            totals[val] += 1
-            if currClass in frequencies[val]:
-                frequencies[val][currClass] += 1
-            else:
-                frequencies[val][currClass] = 1
-        else:
-            totals[val] = 1
-            frequencies[val] = {currClass:1}
+  frequencies = {} # value -> class -> count
+  totals = {} # value -> total count
+  numExamples = len(examples)
+  ig = [] # add all the values to sum to this array then use numpy to do summation
+  for ex in examples:
+    val = ex.get(attribute) # yes, no, ?
+    currClass = ex.get("Class")
+    if val in frequencies:
+      totals[val] += 1
+      if currClass in frequencies[val]:
+        frequencies[val][currClass] += 1
+      else:
+        frequencies[val][currClass] = 1
+    else:
+      totals[val] = 1
+      frequencies[val] = {currClass:1}
 
-    for v in frequencies:
-        probVal = totals[v]/numExamples
-        e = []
-        for c in frequencies[v]: # for each class
-            prob = float(frequencies[v][c])/totals[v]
-            e.append(prob*math.log(prob,2))
-        entropy = -sum(e)
-        ig.append(probVal*entropy)
+  for v in frequencies:
+    probVal = totals[v]/numExamples
+    e = []
+    for c in frequencies[v]: # for each class
+      prob = float(frequencies[v][c])/totals[v]
+      e.append(prob*math.log(prob,2))
+    entropy = -sum(e)
+    ig.append(probVal*entropy)
 
-    informationGain = sum(ig)
-    return informationGain
+  informationGain = sum(ig)
+  return informationGain
 
 def prune(node, examples):
   '''
