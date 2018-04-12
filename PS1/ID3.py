@@ -22,7 +22,6 @@ def ID3(examples, default):
 
   if all(ex.get("Class") == firstLabel for ex in examples):
       allSameClass = True
-      print "ALL ARE CLASS: ", mode(examples)
 
   if allSameClass or isTrivialSplit:
       return Node(mode(examples))
@@ -66,10 +65,6 @@ def mode(examples):
       counts[c] = 1
   return max(counts, key=counts.get)
 
-''' TODO : pick best attribute from examples '''
-# def chooseAttribute(examples):
-#   return examples.keys()[0]
-
 ''' 
 Find the attribute that maximizes information gain
 '''
@@ -81,24 +76,19 @@ def chooseAttribute(examples):
         if attrib == "Class":
             continue
         currIG = infoGain(examples,attrib)
-        print "currIG: ", currIG, "\n"
         if currIG < bestIG:
             bestIG = currIG
             bestAttrib = attrib
     return bestAttrib
 
 def infoGain(examples, attribute):
-    print "Attribute: ", attribute
     frequencies = {} # value -> class -> count
     totals = {} # value -> total count
     numExamples = len(examples)
     ig = [] # add all the values to sum to this array then use numpy to do summation
     for ex in examples:
-        print "example: ", ex
         val = ex.get(attribute) # yes, no, ?
-        print "Value: ", val
         currClass = ex.get("Class")
-        print "Class: ", currClass
         if val in frequencies:
             totals[val] += 1
             if currClass in frequencies[val]:
@@ -108,20 +98,13 @@ def infoGain(examples, attribute):
         else:
             totals[val] = 1
             frequencies[val] = {currClass:1}
-    print "frequencies: ",frequencies
-    print "totals: ", totals
 
     for v in frequencies:
         probVal = totals[v]/numExamples
-        print "probVal: ", probVal
         e = []
         for c in frequencies[v]: # for each class
-            print "frequencies[v][c]: ", frequencies[v][c]
-            print "TOT: ", totals[v]
             prob = float(frequencies[v][c])/totals[v]
-            print "prob: ", prob
             e.append(prob*math.log(prob,2))
-        print "entropy: ", e
         entropy = -sum(e)
         ig.append(probVal*entropy)
 
