@@ -44,6 +44,7 @@ def ID3(examples, default):
       subTree.decisionAttribute = best
       childNode = Node()
       childNode.label = value
+      t.children[value] = childNode
     # print "tree: ", t.attributeName
     # print "tree children: ", t.children.keys()
     return t
