@@ -1,6 +1,8 @@
 class Node:
-  def __init__(self, label):
+  def __init__(self):
     self.label = None
-    self.attribute = None
+    self.attributeName = None
     self.children = {}
+    self.subtree = []
+    self.decisionAttribute = None
 	

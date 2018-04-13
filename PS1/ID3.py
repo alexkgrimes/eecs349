@@ -9,36 +9,43 @@ def ID3(examples, default):
   Any missing attributes are denoted with a value of "?"
   '''
 
-  print "Running ID3...\n"
-
-  # print "Examples: ", examples
+  # print "Running ID3...\n"
 
   firstLabel = examples[0].get("Class")
   allSameClass = False
   isTrivialSplit = checkTrivialSplit(examples)
 
   if not examples: # examples is empty
-    return Node(default)
+    node = Node()
+    node.label = default
+    return node
 
-  if all(ex.get("Class") == firstLabel for ex in examples):
+  if all(ex.get("Class") == firstLabel for ex in examples): # or len(examples) == 1?
     allSameClass = True
 
   if allSameClass or isTrivialSplit:
-    return Node(mode(examples))
+    node = Node()
+    node.label = mode(examples)
+    return node
   else:
     best, bestValues = chooseAttribute(examples)
-    print "Attrib to split on: ", best
-    print "Best values: ", bestValues
-    t = Node(None)
-    t.attribute = best
-    newExamples = []
+    # print "Attrib to split on: ", best
+    # print "Best values: ", bestValues
+    t = Node()
+    t.label = None
+    t.attributeName = best
     for value in bestValues.keys():
+      newExamples = []
+      # print "value: ", value
       for ex in examples:
-        if ex[best] == value:
+        if ex.get(best) == value:
           newExamples.append(ex)
-      subtree = ID3(newExamples,mode(examples))
-      t.children[best] = Node(None) # FIX THIS
-    print "tree: ", t
+      subTree = ID3(newExamples,mode(examples)) # subtree <- ID3(examplesi,MODE(examples))
+      subTree.decisionAttribute = best
+      childNode = Node()
+      childNode.label = value
+    # print "tree: ", t.attributeName
+    # print "tree children: ", t.children.keys()
     return t
 
 ''' ----------------HELPERS--------------- '''
@@ -74,7 +81,7 @@ def mode(examples):
 Find the attribute that maximizes information gain
 '''
 def chooseAttribute(examples):
-  print "running function chooseAttribute"
+  # print "running function chooseAttribute"
   bestAttrib = None # want the attrib with minimum informationGain
   bestIG = float('inf')
   bestValues = None
@@ -88,6 +95,9 @@ def chooseAttribute(examples):
       bestValues = values
   return bestAttrib, bestValues
 
+'''
+Calculate the information gain for a given attribute
+'''
 def infoGain(examples, attribute):
   frequencies = {} # value -> class -> count
   totals = {} # value -> total count
@@ -136,4 +146,11 @@ def evaluate(node, example):
   Takes in a tree and one example.  Returns the Class value that the tree
   assigns to the example.
   '''
+  if node.label is not None: # only leaf nodes should have a label that is not None
+    return node.label
+  attrib = node.attributeName
+  val = example.get(attrib)
+  newNode = node.children[val]
+  return evaluate(newNode, example) # evaluate the child
+
 
