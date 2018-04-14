@@ -36,17 +36,13 @@ def ID3(examples, default):
     t.attributeName = best
     for value in bestValues.keys():
       newExamples = []
-      # print "value: ", value
       for ex in examples:
         if ex.get(best) == value:
           newExamples.append(ex)
       subTree = ID3(newExamples,mode(examples)) # subtree <- ID3(examplesi,MODE(examples))
-      subTree.decisionAttribute = best
-      childNode = Node()
-      childNode.label = value
-      t.children[value] = childNode
-    # print "tree: ", t.attributeName
-    # print "tree children: ", t.children.keys()
+      t.children[value] = subTree
+    #print "tree: ", t.attributeName
+    #print "tree children: ", t.children.keys()
     return t
 
 ''' ----------------HELPERS--------------- '''
@@ -147,11 +143,10 @@ def evaluate(node, example):
   Takes in a tree and one example.  Returns the Class value that the tree
   assigns to the example.
   '''
-  if node.label is not None: # only leaf nodes should have a label that is not None
+  # if node.label is not None: # only leaf nodes should have a label that is not None
+  if not node.children:
     return node.label
   attrib = node.attributeName
   val = example.get(attrib)
   newNode = node.children[val]
   return evaluate(newNode, example) # evaluate the child
-
-

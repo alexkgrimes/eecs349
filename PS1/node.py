@@ -3,6 +3,6 @@ class Node:
     self.label = None
     self.attributeName = None
     self.children = {}
-    self.subtree = []
-    self.decisionAttribute = None
+    #self.subtree = []
+    #self.decisionAttribute = None
 	
