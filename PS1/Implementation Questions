@@ -1,0 +1,18 @@
+Implementation Questions
+
+1. Which other student, if any, is in your group? 
+	Miki Litt, Alex Grimes
+
+2. Did you alter the Node data structure? If so, how and why?
+	Yes, we added an attributeName variable to store the attribute that the node is splitting on. We also added a parent variable so we could use it for pruning to change the children dictionary when pruning a node.
+
+3. How did you handle missing attributes, and why did you choose this strategy? (2 sentences)
+	For missing attributes during training, we simply considered the '?' as another value for the attribute.  For validation, if the value of the attribute was not seen during training, we picked randomly between the values of the branches that were present.
+
+4. How did you perform pruning, and why did you choose this strategy? (4 sentences)
+	For pruning, we traversed through the tree bottom-up using recursion.  When we came across a non-leaf node, we tested whether the validation set did better with the original tree or the tree with the node pruned out. If the pruned tree did better, we replaced the original node with our pruned node with the same label as the original node (because the label is already the mode of examples) and no children.
+
+5. Now you will try your learner on the house_votes_84.data, and plot learning curves. Specifically, you should experiment under two settings: with pruning, and without pruning. Use training set sizes ranging between 10 and 300 examples. For each training size you choose, perform 100 random runs, for each run testing on all examples not used for training (see testPruningOnHouseData from unit_tests.py for one example of this). Plot the average accuracy of the 100 runs as one point on a learning curve (x-axis = number of training examples, y-axis = accuracy on test data). Connect the points to show one line representing accuracy with pruning, the other without. Include your plot in your pdf, and answer two questions:
+In about a sentence, what is the general trend of both lines as training set size increases, and why does this make sense?
+
+In about two sentences, how does the advantage of pruning change as the data set size increases? Does this make sense, and why or why not?

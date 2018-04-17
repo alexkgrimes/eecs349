@@ -30,8 +30,6 @@ def ID3(examples, default):
     return node
   else:
     best, bestValues = chooseAttribute(examples)
-    # print "Attrib to split on: ", best
-    # print "Best values: ", bestValues
     t = Node()
     t.label = mode(examples)
     t.attributeName = best
@@ -41,11 +39,8 @@ def ID3(examples, default):
         if ex.get(best) == value:
           newExamples.append(ex)
       subTree = ID3(newExamples,mode(examples)) # subtree <- ID3(examplesi,MODE(examples))
-      subTree.exs = newExamples
+      subTree.parent = t
       t.children[value] = subTree
-    #print "tree: ", t.attributeName
-    #print "tree children: ", t.children.keys()
-    # print "examples: ", subTree.exs
     return t
 
 ''' ----------------HELPERS--------------- '''
@@ -58,7 +53,6 @@ def checkTrivialSplit(examples):
   toMatch = examples[0]
   for ex in examples:
     for attrib, value in ex.iteritems():
-      ''' TODO : add robustness for missing attributes '''
       if value != toMatch[attrib]:
         isTrivial = False
         break
@@ -81,8 +75,9 @@ def mode(examples):
 Find the attribute that maximizes information gain
 '''
 def chooseAttribute(examples):
-  # print "running function chooseAttribute"
-  bestAttrib = None # want the attrib with minimum informationGain
+  # want the attrib with minimum informationGain
+  # confusing var names.. just go with it
+  bestAttrib = None 
   bestIG = float('inf')
   bestValues = None
   for attrib in examples[0].keys():
@@ -133,35 +128,39 @@ def prune(node, examples):
   Takes in a trained tree and a validation set of examples.  Prunes nodes in order
   to improve accuracy on the validation data; the precise pruning strategy is up to you.
   '''
+  pruneHelper(node, None, node, examples)
+  
 
-  '''
-  For my bsaecase, I am comparing the accuracy if I prune the node and if I don't. 
-  If the accuracy is better with pruning, I go ahead and return the pruned node. 
-  In the recursive case, I simply call prune again with the nodes child. 
-  '''
+def pruneHelper(treeTop, value, currNode, examples):
 
-  if not node.children:
-    return node
+  # if it's a leaf, just continue with recursion
+  if not currNode.children:
+    return
 
-  # print examples
-  numExamples = len(examples)
-
-  # accuracy with pruning
-  prunedNode = Node()
-  prunedNode.label = mode(examples)
-  withPruning = test(node, examples)
-  # print "withPruning", withPruning
+  tempNode = currNode
 
   # accuracy without pruning
-  withoutPruning = test(node, examples)
-  # print "withoutPruning: ", withoutPruning
+  withoutPruning = test(treeTop, examples)
 
-  if withPruning > withoutPruning:
-    node = prunedNode
-    
-  else:
-    for value, child in node.children.iteritems():
-      prune(child, child.exs)
+  # accuracy with pruning, create new pruned node
+  # also don't want to prune out the root 
+  if currNode.parent is not None:
+    prunedNode = Node()
+    prunedNode.label = currNode.label
+    prunedNode.children = {}
+    currNode.parent.children.update({value : prunedNode})
+    currNode = prunedNode
+
+  withPruning = test(treeTop, examples)
+
+  # if original is actually better, set node back to original
+  if withPruning <= withoutPruning:
+    node = tempNode
+    if tempNode.parent is not None:
+      tempNode.parent.children.update({value : tempNode})
+
+  for value, child in currNode.children.iteritems():
+    pruneHelper(treeTop, value, child, examples)
 
 def test(node, examples):
   '''

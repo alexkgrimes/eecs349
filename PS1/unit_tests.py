@@ -92,4 +92,4 @@ def testPruningOnHouseData(inFile):
 testID3AndEvaluate()
 testPruning()
 testID3AndTest()
-testPruningOnHouseData("/mnt/c/Users/alex/Documents/eecs349/PS1/house_votes_84.data")
+# testPruningOnHouseData("/mnt/c/Users/alex/Documents/eecs349/PS1/house_votes_84.data")
