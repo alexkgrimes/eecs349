@@ -1,5 +1,6 @@
 from node import Node
 import math
+import random
 
 def ID3(examples, default):
   '''
@@ -32,7 +33,7 @@ def ID3(examples, default):
     # print "Attrib to split on: ", best
     # print "Best values: ", bestValues
     t = Node()
-    t.label = None
+    t.label = mode(examples)
     t.attributeName = best
     for value in bestValues.keys():
       newExamples = []
@@ -40,9 +41,11 @@ def ID3(examples, default):
         if ex.get(best) == value:
           newExamples.append(ex)
       subTree = ID3(newExamples,mode(examples)) # subtree <- ID3(examplesi,MODE(examples))
+      subTree.exs = newExamples
       t.children[value] = subTree
     #print "tree: ", t.attributeName
     #print "tree children: ", t.children.keys()
+    # print "examples: ", subTree.exs
     return t
 
 ''' ----------------HELPERS--------------- '''
@@ -131,11 +134,46 @@ def prune(node, examples):
   to improve accuracy on the validation data; the precise pruning strategy is up to you.
   '''
 
+  '''
+  For my bsaecase, I am comparing the accuracy if I prune the node and if I don't. 
+  If the accuracy is better with pruning, I go ahead and return the pruned node. 
+  In the recursive case, I simply call prune again with the nodes child. 
+  '''
+
+  if not node.children:
+    return node
+
+  # print examples
+  numExamples = len(examples)
+
+  # accuracy with pruning
+  prunedNode = Node()
+  prunedNode.label = mode(examples)
+  withPruning = test(node, examples)
+  # print "withPruning", withPruning
+
+  # accuracy without pruning
+  withoutPruning = test(node, examples)
+  # print "withoutPruning: ", withoutPruning
+
+  if withPruning > withoutPruning:
+    node = prunedNode
+    
+  else:
+    for value, child in node.children.iteritems():
+      prune(child, child.exs)
+
 def test(node, examples):
   '''
   Takes in a trained tree and a test set of examples.  Returns the accuracy (fraction
   of examples the tree classifies correctly).
   '''
+  numSuccesses = 0.0
+  for ex in examples:
+    c = evaluate(node, ex)
+    if c == ex.get("Class"):
+      numSuccesses += 1.0
+  return numSuccesses / float(len(examples))
 
 
 def evaluate(node, example):
@@ -143,10 +181,15 @@ def evaluate(node, example):
   Takes in a tree and one example.  Returns the Class value that the tree
   assigns to the example.
   '''
-  # if node.label is not None: # only leaf nodes should have a label that is not None
+  # if it's a leaf node
   if not node.children:
     return node.label
-  attrib = node.attributeName
-  val = example.get(attrib)
-  newNode = node.children[val]
-  return evaluate(newNode, example) # evaluate the child
+  else:
+    attrib = node.attributeName
+    key = example.get(attrib)
+    if key not in node.children.keys():
+      r = random.randint(0, len(node.children) - 1)
+      newNode = node.children.values()[r]
+    else:
+      newNode = node.children[key]
+    return evaluate(newNode, example) # evaluate the child
