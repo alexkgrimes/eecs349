@@ -1,4 +1,5 @@
 import ID3, parse, random
+import matplotlib.pyplot as plt
 
 def testID3AndEvaluate():
   data = [dict(a=1, b=0, Class=1), dict(a=1, b=1, Class=1)]
@@ -89,7 +90,40 @@ def testPruningOnHouseData(inFile):
   print withoutPruning
   print "average with pruning",sum(withPruning)/len(withPruning)," without: ",sum(withoutPruning)/len(withoutPruning)
 
+  def makePlot(inFile, sizeOfTrainingSet):
+    withPruning = []
+    withoutPruning = []
+    pruningAvgs = []
+    noPruningAvgs = []
+    data = parse.parse(inFile)
+
+    for size in sizeOfTrainingSet:
+      for i in range(100):
+        random.shuffle(data)
+        train = data[:.7*size]
+        valid = data[.7*size:size]
+        test = data[size:]
+      
+        tree = ID3.ID3(train, 'democrat')
+        ID3.prune(tree, valid)
+        pruneAcc = ID3.test(tree, test)
+        withPruning.append(pruneAcc)
+
+        tree = ID3.ID3(train+valid, 'democrat')
+        noPruneAcc = ID3.test(tree, test)
+        withoutPruning.append(noPruneAcc)
+
+      pruningAvgs.append(sum(withPruning)/len(withPruning)) 
+      noPruningAvgs.append(sum(withoutPruning)/len(withoutPruning))
+
+    plt.plot(pruningAvgs)
+    plt.xlabel('Data set size')
+    plt.show()
+
+
+
 testID3AndEvaluate()
 testPruning()
 testID3AndTest()
 # testPruningOnHouseData("/mnt/c/Users/alex/Documents/eecs349/PS1/house_votes_84.data")
+makePlot("/mnt/c/Users/alex/Documents/eecs349/PS1/house_votes_84.data", [10, 100, 300])
