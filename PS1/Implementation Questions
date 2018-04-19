@@ -4,15 +4,16 @@ Implementation Questions
 	Mikayla Litt, Alex Grimes
 
 2. Did you alter the Node data structure? If so, how and why?
-	Yes, we added an attributeName variable to store the attribute that the node is splitting on. We also added a parent variable so we could use it for pruning to change the children dictionary when pruning a node.
+	Yes, we added an attributeName variable to store the attribute that the node is splitting on. In addition, we added an examples array to the Node structure so that we could track the examples that pass through the Node when building the tree. We then used this when pruning to allow us to relabel the node with the mode of the examples that passed through it during training.
 
 3. How did you handle missing attributes, and why did you choose this strategy? (2 sentences)
 	For missing attributes during training, we simply considered the '?' as another value for the attribute.  For validation, if the value of the attribute was not seen during training, we picked randomly between the values of the branches that were present.
 
 4. How did you perform pruning, and why did you choose this strategy? (4 sentences)
-	For pruning, we traversed through the tree bottom-up using recursion.  When we came across a non-leaf node, we tested whether the validation set did better with the original tree or the tree with the node pruned out. If the pruned tree did better, we replaced the original node with our pruned node with the same label as the original node (because the label is already the mode of examples) and no children.
+	For pruning, we traversed through the tree bottom-up using recursion.  When we came across an internal node, we tested whether the validation set did better with the original subtree or with the subtree pruned out. If the pruned subtree did better, we replaced the original node with our pruned node. We chose this strategy because with large data sets it increased the accuracy on our test data and it is short and simple to implement because it uses recursion similar to depth-first search.
 
 5. Now you will try your learner on the house_votes_84.data, and plot learning curves. Specifically, you should experiment under two settings: with pruning, and without pruning. Use training set sizes ranging between 10 and 300 examples. For each training size you choose, perform 100 random runs, for each run testing on all examples not used for training (see testPruningOnHouseData from unit_tests.py for one example of this). Plot the average accuracy of the 100 runs as one point on a learning curve (x-axis = number of training examples, y-axis = accuracy on test data). Connect the points to show one line representing accuracy with pruning, the other without. Include your plot in your pdf, and answer two questions:
 In about a sentence, what is the general trend of both lines as training set size increases, and why does this make sense?
-
+    As the training set size increases, the accuracy of both lines increases exponentially until the data set size reaches around 100 examples. At this point, it then levels off. This makes sense because once you reach a substantial number of examples, adding additional examples has less impact on the tree structure.
 In about two sentences, how does the advantage of pruning change as the data set size increases? Does this make sense, and why or why not?
+    The advantage of pruning is most apparent for large data sets. With large data sets, there is a tendency for the tree to be overfitted for the training set. Pruning works to correct this overfitting, leading to a more accurate result for the test data.
