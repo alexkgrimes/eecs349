@@ -137,6 +137,6 @@ def makePlot(inFile, sizeOfTrainingSet):
 testID3AndEvaluate()
 testPruning()
 testID3AndTest()
-# testPruningOnHouseData("C:/Users/ttila/Documents/EECS_349/PS1/eecs349/eecs349/PS1/house_votes_84.data")
-testPruningOnHouseData("/mnt/c/Users/alex/Documents/eecs349/PS1/house_votes_84.data")
+testPruningOnHouseData("C:/Users/ttila/Documents/EECS_349/PS1/eecs349/eecs349/PS1/house_votes_84.data")
+# testPruningOnHouseData("/mnt/c/Users/alex/Documents/eecs349/PS1/house_votes_84.data")
 # makePlot("C:/Users/ttila/Documents/EECS_349/PS1/eecs349/eecs349/PS1/house_votes_84.data", [10,20,40,60,80,100,120,140,160,180,200,220,240,260,280,300])

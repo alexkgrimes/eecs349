@@ -27,6 +27,7 @@ def ID3(examples, default):
   if allSameClass or isTrivialSplit:
     node = Node()
     node.label = mode(examples)
+    node.exs = examples
     return node
   else:
     best, bestValues = chooseAttribute(examples)
