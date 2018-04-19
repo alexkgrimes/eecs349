@@ -3,9 +3,12 @@ import matplotlib.pyplot as plt
 
 def testID3AndEvaluate():
   data = [dict(a=1, b=0, Class=1), dict(a=1, b=1, Class=1)]
+  # data = [dict(a=1, b=0, c=0, Class=1), dict(a=1, b=1, c=0, Class=1), dict(a=1, b=0, c=1, Class=0), dict(a=0, b=0, c=0, Class=0)]
   tree = ID3.ID3(data, 0)
+  # print tree
   if tree != None:
     ans = ID3.evaluate(tree, dict(a=1, b=0))
+    # print "answer: ", ans
     if ans != 1:
       print "ID3 test failed."
     else:
@@ -34,6 +37,7 @@ def testID3AndTest():
   testData = [dict(a=1, b=0, c=1, Class=1), dict(a=1, b=1, c=1, Class=1), 
   dict(a=0, b=0, c=1, Class=0), dict(a=0, b=1, c=1, Class=0)]
   tree = ID3.ID3(trainData, 0)
+  # print tree
   fails = 0
   if tree != None:
     acc = ID3.test(tree, trainData)
@@ -91,17 +95,20 @@ def testPruningOnHouseData(inFile):
   print "average with pruning",sum(withPruning)/len(withPruning)," without: ",sum(withoutPruning)/len(withoutPruning)
 
 def makePlot(inFile, sizeOfTrainingSet):
-  withPruning = []
-  withoutPruning = []
+  # withPruning = []
+  # withoutPruning = []
   pruningAvgs = []
   noPruningAvgs = []
   data = parse.parse(inFile)
 
   for size in sizeOfTrainingSet:
+    withPruning = []
+    withoutPruning = []
+
     for i in range(100):
       random.shuffle(data)
-      train = data[:int(.7*size)]
-      valid = data[int(.7*size):size]
+      train = data[:7*size/10]
+      valid = data[7*size/10:size]
       test = data[size:]
       
       tree = ID3.ID3(train, 'democrat')
@@ -128,6 +135,6 @@ def makePlot(inFile, sizeOfTrainingSet):
 testID3AndEvaluate()
 testPruning()
 testID3AndTest()
-# testPruningOnHouseData("C:/Users/ttila/Documents/EECS_349/PS1/eecs349/eecs349/PS1/house_votes_84.data")
+testPruningOnHouseData("C:/Users/ttila/Documents/EECS_349/PS1/eecs349/eecs349/PS1/house_votes_84.data")
 # testPruningOnHouseData("/mnt/c/Users/alex/Documents/eecs349/PS1/house_votes_84.data")
-makePlot("C:/Users/ttila/Documents/EECS_349/PS1/eecs349/eecs349/PS1/house_votes_84.data", [10,50,75,100,125,150,175,200,225,250,275,300])
+# makePlot("C:/Users/ttila/Documents/EECS_349/PS1/eecs349/eecs349/PS1/house_votes_84.data", [10,20,40,60,80,100,120,140,160,180,200,220,240,260,280,300])
