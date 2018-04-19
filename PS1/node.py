@@ -4,6 +4,7 @@ class Node:
     self.attributeName = None
     self.children = {}
     self.parent = None
+    self.exs = []
 
   # function so you can just write print tree
   def __str__(self, level=0):

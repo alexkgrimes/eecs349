@@ -31,7 +31,6 @@ def ID3(examples, default):
   else:
     best, bestValues = chooseAttribute(examples)
     t = Node()
-    t.label = mode(examples)
     t.attributeName = best
     for value in bestValues.keys():
       newExamples = []
@@ -39,7 +38,8 @@ def ID3(examples, default):
         if ex.get(best) == value:
           newExamples.append(ex)
       subTree = ID3(newExamples,mode(examples)) # subtree <- ID3(examplesi,MODE(examples))
-      subTree.parent = t
+      subTree.exs = newExamples
+      t.exs = newExamples
       t.children[value] = subTree
     return t
 
@@ -128,39 +128,23 @@ def prune(node, examples):
   Takes in a trained tree and a validation set of examples.  Prunes nodes in order
   to improve accuracy on the validation data; the precise pruning strategy is up to you.
   '''
-  pruneHelper(node, None, node, examples)
-  
+  for child in node.children.values():
+    prune(child, examples)
 
-def pruneHelper(treeTop, value, currNode, examples):
+  tempChildren = node.children
+  tempLabel = node.label
 
-  # if it's a leaf, just continue with recursion
-  if not currNode.children:
-    return
+  withoutPruning = test(node, examples)
 
-  tempNode = currNode
-
-  # accuracy without pruning
-  withoutPruning = test(treeTop, examples)
-
-  # accuracy with pruning, create new pruned node
-  # also don't want to prune out the root 
-  if currNode.parent is not None:
-    prunedNode = Node()
-    prunedNode.label = currNode.label
-    prunedNode.children = {}
-    currNode.parent.children.update({value : prunedNode})
-    currNode = prunedNode
-
-  withPruning = test(treeTop, examples)
+  node.children = {}
+  node.label = mode(node.exs)
+  withPruning = test(node, examples)
 
   # if original is actually better, set node back to original
-  if withPruning <= withoutPruning:
-    node = tempNode
-    if tempNode.parent is not None:
-      tempNode.parent.children.update({value : tempNode})
-
-  for value, child in currNode.children.iteritems():
-    pruneHelper(treeTop, value, child, examples)
+  if withPruning < withoutPruning:
+    node.children = tempChildren
+    node.label = tempLabel
+  
 
 def test(node, examples):
   '''
@@ -173,7 +157,6 @@ def test(node, examples):
     if c == ex.get("Class"):
       numSuccesses += 1.0
   return numSuccesses / float(len(examples))
-
 
 def evaluate(node, example):
   '''

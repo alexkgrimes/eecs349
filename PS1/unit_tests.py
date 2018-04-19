@@ -20,7 +20,9 @@ def testPruning():
   data = [dict(a=1, b=1, c=1, Class=0), dict(a=1, b=0, c=0, Class=0), dict(a=0, b=1, c=0, Class=1), dict(a=0, b=0, c=0, Class=1), dict(a=0, b=0, c=1, Class=0)]
   validationData = [dict(a=0, b=0, c=1, Class=1)]
   tree = ID3.ID3(data, 0)
+  print ID3.test(tree, validationData)
   ID3.prune(tree, validationData)
+  print ID3.test(tree, validationData)
   if tree != None:
     ans = ID3.evaluate(tree, dict(a=0, b=1, c=1))
     if ans != 1:
@@ -66,29 +68,29 @@ def testPruningOnHouseData(inFile):
   data = parse.parse(inFile)
   for i in range(100):
     random.shuffle(data)
-    train = data[:len(data)/2]
-    valid = data[len(data)/2:3*len(data)/4]
-    test = data[3*len(data)/4:]
+    train = data[:7*300/10]
+    valid = data[7*300/10:300]
+    test = data[300:]
   
     tree = ID3.ID3(train, 'democrat')
     acc = ID3.test(tree, train)
-    print "training accuracy: ",acc
+    # print "training accuracy: ",acc
     acc = ID3.test(tree, valid)
-    print "validation accuracy: ",acc
+    # print "validation accuracy: ",acc
     acc = ID3.test(tree, test)
-    print "test accuracy: ",acc
+    # print "test accuracy: ",acc
   
     ID3.prune(tree, valid)
     acc = ID3.test(tree, train)
-    print "pruned tree train accuracy: ",acc
+    # print "pruned tree train accuracy: ",acc
     acc = ID3.test(tree, valid)
-    print "pruned tree validation accuracy: ",acc
+    # print "pruned tree validation accuracy: ",acc
     acc = ID3.test(tree, test)
-    print "pruned tree test accuracy: ",acc
+    # print "pruned tree test accuracy: ",acc
     withPruning.append(acc)
     tree = ID3.ID3(train+valid, 'democrat')
     acc = ID3.test(tree, test)
-    print "no pruning test accuracy: ",acc
+    # print "no pruning test accuracy: ",acc
     withoutPruning.append(acc)
   print withPruning
   print withoutPruning
@@ -135,6 +137,6 @@ def makePlot(inFile, sizeOfTrainingSet):
 testID3AndEvaluate()
 testPruning()
 testID3AndTest()
-testPruningOnHouseData("C:/Users/ttila/Documents/EECS_349/PS1/eecs349/eecs349/PS1/house_votes_84.data")
-# testPruningOnHouseData("/mnt/c/Users/alex/Documents/eecs349/PS1/house_votes_84.data")
+# testPruningOnHouseData("C:/Users/ttila/Documents/EECS_349/PS1/eecs349/eecs349/PS1/house_votes_84.data")
+testPruningOnHouseData("/mnt/c/Users/alex/Documents/eecs349/PS1/house_votes_84.data")
 # makePlot("C:/Users/ttila/Documents/EECS_349/PS1/eecs349/eecs349/PS1/house_votes_84.data", [10,20,40,60,80,100,120,140,160,180,200,220,240,260,280,300])
